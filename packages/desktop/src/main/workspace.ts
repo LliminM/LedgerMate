@@ -35,7 +35,7 @@ function writeIfNotExists(filePath: string, content: string): void {
 export async function ensureWorkspace(): Promise<void> {
   const home = workspaceDir();
 
-  for (const dir of ["ledger", "files", "sessions"]) {
+  for (const dir of ["ledger", "files", "sessions", "rag/chroma"]) {
     mkdirSync(join(home, dir), { recursive: true });
   }
 

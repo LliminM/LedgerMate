@@ -26,6 +26,7 @@
     "@tanstack/react-virtual": "3.14.9",
     "assistant-stream": "^0.3.24",
     "class-variance-authority": "^0.7.1",
+    "chromadb": "3.5.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "electron-updater": "^6.6.2",

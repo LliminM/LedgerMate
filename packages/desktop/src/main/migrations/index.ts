@@ -4,9 +4,10 @@
 import { homedir } from "node:os";
 import { workspaceDir } from "../env";
 import { relocateLegacyHome } from "./0001-relocate-legacy-home";
+import { ignoreChromaIndex } from "./0002-ignore-chroma-index";
 import { type Migration, runMigrations } from "./runner";
 
-export const MIGRATIONS: readonly Migration[] = [relocateLegacyHome];
+export const MIGRATIONS: readonly Migration[] = [relocateLegacyHome, ignoreChromaIndex];
 
 /** Run the migrations the active workspace has not seen yet. */
 export function runPendingMigrations(): Promise<string[]> {

@@ -39,6 +39,7 @@ describe("workspace paths", () => {
       expect(mod.sessionsDir()).toBe("/ws/sessions");
       expect(mod.mainJournalPath()).toBe("/ws/ledger/main.journal");
       expect(mod.appSettingsPath()).toBe("/ws/app-settings.json");
+      expect(mod.chromaDataDir()).toBe("/ws/rag/chroma");
     } finally {
       if (prev === undefined) delete process.env.ACCOUNTANT24_WORKSPACE;
       else process.env.ACCOUNTANT24_WORKSPACE = prev;
@@ -144,6 +145,20 @@ describe("agentEnv()", () => {
       if (prev === undefined) delete process.env.ACCOUNTANT24_WORKSPACE;
       else process.env.ACCOUNTANT24_WORKSPACE = prev;
       Object.defineProperty(process, "resourcesPath", { value: origRes, configurable: true });
+    }
+  });
+
+  it("should pass the app-managed Chroma URL to the agent host", async () => {
+    const previous = process.env.ACCOUNTANT24_CHROMA_URL;
+    process.env.ACCOUNTANT24_CHROMA_URL = "http://127.0.0.1:43123";
+    h.app.isPackaged = false;
+    h.existsSync.mockReturnValue(false);
+    try {
+      const mod = await import("../env");
+      expect(mod.agentEnv().ACCOUNTANT24_CHROMA_URL).toBe("http://127.0.0.1:43123");
+    } finally {
+      if (previous === undefined) delete process.env.ACCOUNTANT24_CHROMA_URL;
+      else process.env.ACCOUNTANT24_CHROMA_URL = previous;
     }
   });
 

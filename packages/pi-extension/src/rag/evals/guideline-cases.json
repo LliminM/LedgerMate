@@ -1,0 +1,1037 @@
+[
+  {
+    "id": "invoice-title",
+    "question": "按本指南，浙江大学报销发票的抬头和统一社会信用代码分别是什么？",
+    "expectedSection": "1",
+    "expectedPage": 8,
+    "mustContain": [
+      "浙江大学",
+      "12100000470095016Q"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "发票抬头为浙江大学，统一社会信用代码为12100000470095016Q。",
+    "expectedEvidence": [
+      {
+        "section": "1",
+        "page": 8,
+        "printedPage": 1
+      }
+    ]
+  },
+  {
+    "id": "invoice-small-signature",
+    "question": "按本指南，一张400元的小额发票背面可以由付款人一人签字吗？",
+    "expectedSection": "3",
+    "expectedPage": 9,
+    "mustContain": [
+      "付款人",
+      "签字"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "可以；500元以下小额发票背面可由付款人一人签字。",
+    "expectedEvidence": [
+      {
+        "section": "3",
+        "page": 9,
+        "printedPage": 2
+      }
+    ]
+  },
+  {
+    "id": "invoice-named-train-signature",
+    "question": "按本指南，已经实名显示的火车票还需要背面签字吗？",
+    "expectedSection": "3",
+    "expectedPage": 9,
+    "mustContain": [
+      "实名",
+      "签字"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "已实名显示的火车票可不再签字。",
+    "expectedEvidence": [
+      {
+        "section": "3",
+        "page": 9,
+        "printedPage": 2
+      }
+    ]
+  },
+  {
+    "id": "invoice-december-deadline",
+    "question": "按本指南，12月份产生的票据，特殊情况下最迟可顺延到什么时候报销？",
+    "expectedSection": "3",
+    "expectedPage": 10,
+    "mustContain": [
+      "次年",
+      "第一季度"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "特殊情况下可顺延至次年第一季度报销；当年票据原则上应在当年内报销。",
+    "expectedEvidence": [
+      {
+        "section": "3",
+        "page": 10,
+        "printedPage": 3
+      }
+    ]
+  },
+  {
+    "id": "invoice-taxi-serial-rejection",
+    "question": "按本指南，出租车连号发票能受理报销吗？",
+    "expectedSection": "4",
+    "expectedPage": 10,
+    "mustContain": [
+      "连号",
+      "不予受理"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "出租车连号发票不予受理。注意：这是文档明确规定的不予报销，仍属于可回答问题。",
+    "expectedEvidence": [
+      {
+        "section": "4",
+        "page": 10,
+        "printedPage": 3
+      }
+    ]
+  },
+  {
+    "id": "invoice-electronic-400",
+    "question": "按本指南，400元电子发票是否可以书面承诺不重复报销后免于认证？",
+    "expectedSection": "5",
+    "expectedPage": 11,
+    "mustContain": [
+      "书面承诺",
+      "不重复报销"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "可以，但须书面承诺不重复报销；电子发票仍须打印且内容清晰，其他手续与纸质发票相同。",
+    "expectedEvidence": [
+      {
+        "section": "5",
+        "page": 11,
+        "printedPage": 4
+      },
+      {
+        "section": "12",
+        "page": 16,
+        "printedPage": 9
+      }
+    ]
+  },
+  {
+    "id": "invoice-electronic-600",
+    "question": "按本指南，600元电子发票需不需要在财务综合管理平台认证？",
+    "expectedSection": "5",
+    "expectedPage": 11,
+    "mustContain": [
+      "认证"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "需要在财务综合管理平台进行电子发票认证。",
+    "expectedEvidence": [
+      {
+        "section": "5",
+        "page": 11,
+        "printedPage": 4
+      },
+      {
+        "section": "12",
+        "page": 16,
+        "printedPage": 9
+      }
+    ]
+  },
+  {
+    "id": "invoice-verification-3500",
+    "question": "按本指南，一张3500元的非增值税专用企业发票需要查验吗，查验结果如何提交？",
+    "expectedSection": "7",
+    "expectedPage": 12,
+    "mustContain": [
+      "查验",
+      "打印"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "需要查验，核对无误后打印查询页面，并附于发票后报销；不能将该查验范围扩展到所有票据。",
+    "expectedEvidence": [
+      {
+        "section": "7",
+        "page": 12,
+        "printedPage": 5
+      }
+    ]
+  },
+  {
+    "id": "invoice-lost-procedure",
+    "question": "按本指南，发票因邮寄遗失，可否直接拿普通复印件报销？需要补哪些手续？",
+    "expectedSection": "6",
+    "expectedPage": 11,
+    "mustContain": [
+      "复印件",
+      "财务专用章",
+      "遗失说明",
+      "审批"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "不能直接报销。需开票单位盖财务专用章的复印件、未收款证明或预借款对公支付凭证、经办人遗失说明及相关负责人意见和单位公章、计财处主管领导审批。",
+    "expectedEvidence": [
+      {
+        "section": "6",
+        "page": 11,
+        "printedPage": 4
+      },
+      {
+        "section": "6",
+        "page": 12,
+        "printedPage": 5
+      }
+    ]
+  },
+  {
+    "id": "corporate-card-reservation",
+    "question": "按本指南，公务卡消费至少应在还款日前多少个工作日申请财务报销预约？",
+    "expectedSection": "9",
+    "expectedPage": 14,
+    "mustContain": [
+      "7",
+      "工作日"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "至少在还款日前7个工作日申请。",
+    "expectedEvidence": [
+      {
+        "section": "9",
+        "page": 14,
+        "printedPage": 7
+      }
+    ]
+  },
+  {
+    "id": "office-supplies-online",
+    "question": "按本指南，网购办公用品，发票未列明细时，需要补充哪些附件？",
+    "expectedSection": "14",
+    "expectedPage": 19,
+    "mustContain": [
+      "明细清单",
+      "订单"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "需提供明细清单，并打印网购订单页面作为附件。",
+    "expectedEvidence": [
+      {
+        "section": "14",
+        "page": 19,
+        "printedPage": 12
+      }
+    ]
+  },
+  {
+    "id": "book-bulk-procurement",
+    "question": "按本指南，图书文献资源批量采购金额10万元时，需要集中采购吗？",
+    "expectedSection": "17",
+    "expectedPage": 21,
+    "mustContain": [
+      "10",
+      "集中采购"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "需要；批量金额10万元及以上，应按规定集中采购。",
+    "expectedEvidence": [
+      {
+        "section": "17",
+        "page": 21,
+        "printedPage": 14
+      }
+    ]
+  },
+  {
+    "id": "publication-page-charge",
+    "question": "按本指南，论文版面费报销除预约报销单和发票原件，还需要什么证明？",
+    "expectedSection": "18",
+    "expectedPage": 21,
+    "mustContain": [
+      "录用通知书"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "需要论文录用通知书，或发表论文的证明材料，包括期刊封面、目录、封底等。",
+    "expectedEvidence": [
+      {
+        "section": "18",
+        "page": 21,
+        "printedPage": 14
+      }
+    ]
+  },
+  {
+    "id": "test-fee-5000",
+    "question": "按本指南，5000元测试费是否必须附合同原件，还需要测试报告吗？",
+    "expectedSection": "20",
+    "expectedPage": 22,
+    "mustContain": [
+      "5000",
+      "测试报告",
+      "1万"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "需要测试报告首页和尾页复印件；本条测试费增附合同原件的门槛是1万元及以上，不能误用加工费5000元的合同门槛。还需预约报销单、发票原件、明细清单。",
+    "expectedEvidence": [
+      {
+        "section": "20",
+        "page": 22,
+        "printedPage": 15
+      }
+    ]
+  },
+  {
+    "id": "processing-fee-5000",
+    "question": "按本指南，5000元加工费需要增附合同原件吗？",
+    "expectedSection": "20",
+    "expectedPage": 22,
+    "mustContain": [
+      "5000",
+      "合同原件"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "需要；加工费5000元及以上需要增附合同原件，可由系、所盖章。",
+    "expectedEvidence": [
+      {
+        "section": "20",
+        "page": 22,
+        "printedPage": 15
+      }
+    ]
+  },
+  {
+    "id": "domestic-flight-vat-invoice",
+    "question": "按本指南，国内出差机票使用增值税发票报销时，需另行提供什么？",
+    "expectedSection": "27",
+    "expectedPage": 31,
+    "mustContain": [
+      "订单",
+      "登机牌"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "需要另行提供机票订单或登机牌，二者为可选其一，不要求同时提供。",
+    "expectedEvidence": [
+      {
+        "section": "27",
+        "page": 31,
+        "printedPage": 24
+      }
+    ]
+  },
+  {
+    "id": "train-third-class-default",
+    "question": "按本指南，三类人员不使用科研项目经费出差时，高铁或动车通常能乘坐什么座位？",
+    "expectedSection": "28",
+    "expectedPage": 31,
+    "mustContain": [
+      "二等座"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "通常为高铁或动车二等座。",
+    "expectedEvidence": [
+      {
+        "section": "28",
+        "page": 31,
+        "printedPage": 24
+      }
+    ]
+  },
+  {
+    "id": "train-third-class-research",
+    "question": "按本指南，其余人员使用科研项目经费进行科学研究出差，可乘坐高铁一等座吗？",
+    "expectedSection": "28",
+    "expectedPage": 32,
+    "mustContain": [
+      "一等座"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "可以乘坐高铁或动车一等座；该例外要求使用科研项目经费进行科学研究出差。",
+    "expectedEvidence": [
+      {
+        "section": "28",
+        "page": 32,
+        "printedPage": 25
+      }
+    ]
+  },
+  {
+    "id": "hotel-shanghai-third",
+    "question": "按本指南，不使用科研项目经费出差的三类人员，上海住宿费限额是多少？",
+    "expectedSection": "第三部分/国内差旅住宿费限额标准表",
+    "expectedPage": 79,
+    "mustContain": [
+      "500",
+      "元/人天"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "上海全市三类人员住宿费限额为500元/人天。",
+    "expectedEvidence": [
+      {
+        "section": "第三部分/国内差旅住宿费限额标准表",
+        "page": 79,
+        "printedPage": 72
+      }
+    ]
+  },
+  {
+    "id": "hotel-shanghai-second",
+    "question": "按本指南，不使用科研项目经费出差的二类人员，上海住宿费限额是多少？",
+    "expectedSection": "第三部分/国内差旅住宿费限额标准表",
+    "expectedPage": 79,
+    "mustContain": [
+      "600",
+      "元/人天"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "上海全市二类人员住宿费限额为600元/人天。",
+    "expectedEvidence": [
+      {
+        "section": "第三部分/国内差旅住宿费限额标准表",
+        "page": 79,
+        "printedPage": 72
+      }
+    ]
+  },
+  {
+    "id": "hotel-shanghai-research-third",
+    "question": "按本指南，三类人员使用科研项目经费去上海出差，住宿费上浮30%时的最高限额是多少？",
+    "expectedSection": "29",
+    "expectedPage": 32,
+    "mustContain": [
+      "500",
+      "30%",
+      "650",
+      "据实报销"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "上海三类基准500元/人天，上浮30%后的最高限额为650元/人天；在限额内据实报销，并非固定发放650元。",
+    "expectedEvidence": [
+      {
+        "section": "29",
+        "page": 32,
+        "printedPage": 25
+      },
+      {
+        "section": "第三部分/国内差旅住宿费限额标准表",
+        "page": 79,
+        "printedPage": 72
+      }
+    ]
+  },
+  {
+    "id": "hotel-shanghai-research-actual",
+    "question": "按本指南，三类人员使用科研项目经费去上海出差，每晚实际住宿620元且票据合规，在住宿限额方面可以报销吗？",
+    "expectedSection": "29",
+    "expectedPage": 32,
+    "mustContain": [
+      "620",
+      "650",
+      "据实报销"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "可以在住宿限额方面报销：500×1.3=650元/人天，实际620元在限额内，据实报销620元；不代表所有手续均自动满足。",
+    "expectedEvidence": [
+      {
+        "section": "29",
+        "page": 32,
+        "printedPage": 25
+      },
+      {
+        "section": "第三部分/国内差旅住宿费限额标准表",
+        "page": 79,
+        "printedPage": 72
+      }
+    ]
+  },
+  {
+    "id": "hotel-beijing-senior-professor",
+    "question": "按本指南，56周岁的二级教授使用科研项目经费到北京出差，可以适用哪类住宿标准，限额多少？",
+    "expectedSection": "29",
+    "expectedPage": 32,
+    "mustContain": [
+      "一类",
+      "1100"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "55周岁及以上二级教授使用科研项目经费出差可按一类标准，北京一类限额为1100元/人天。",
+    "expectedEvidence": [
+      {
+        "section": "29",
+        "page": 32,
+        "printedPage": 25
+      },
+      {
+        "section": "第三部分/国内差旅住宿费限额标准表",
+        "page": 77,
+        "printedPage": 70
+      }
+    ]
+  },
+  {
+    "id": "hotel-qingdao-july",
+    "question": "仅按本指南表格，三类人员非科研经费出差，7月到青岛的旺季住宿限额是多少？",
+    "expectedSection": "第三部分/国内差旅住宿费限额标准表",
+    "expectedPage": 79,
+    "mustContain": [
+      "450"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "青岛7—9月三类人员旺季住宿限额为450元/人天。",
+    "expectedEvidence": [
+      {
+        "section": "第三部分/国内差旅住宿费限额标准表",
+        "page": 79,
+        "printedPage": 72
+      }
+    ]
+  },
+  {
+    "id": "hotel-qingdao-october",
+    "question": "仅按本指南表格，三类人员非科研经费出差，10月到青岛的住宿限额是多少？",
+    "expectedSection": "第三部分/国内差旅住宿费限额标准表",
+    "expectedPage": 79,
+    "mustContain": [
+      "380"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "10月不属于表列7—9月旺季，三类住宿限额为380元/人天。",
+    "expectedEvidence": [
+      {
+        "section": "第三部分/国内差旅住宿费限额标准表",
+        "page": 79,
+        "printedPage": 72
+      }
+    ]
+  },
+  {
+    "id": "meal-allowance-xinjiang",
+    "question": "按本指南，到新疆出差，伙食补助和按天包干的市内交通费标准分别是多少？",
+    "expectedSection": "30",
+    "expectedPage": 33,
+    "mustContain": [
+      "120",
+      "80"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "伙食补助120元/人/天；选择按天包干的市内交通费80元/人/天，市内交通也可选择据实报销。",
+    "expectedEvidence": [
+      {
+        "section": "30",
+        "page": 33,
+        "printedPage": 26
+      }
+    ]
+  },
+  {
+    "id": "meal-allowance-other",
+    "question": "按本指南，到上海出差，伙食补助和按天包干的市内交通费标准分别是多少？",
+    "expectedSection": "30",
+    "expectedPage": 33,
+    "mustContain": [
+      "100",
+      "80"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "上海属于其他地区，伙食补助100元/人/天；按天包干的市内交通费80元/人/天。",
+    "expectedEvidence": [
+      {
+        "section": "30",
+        "page": 33,
+        "printedPage": 26
+      }
+    ]
+  },
+  {
+    "id": "meal-allowance-double-claim",
+    "question": "按本指南，校外单位已承担我的出差伙食费，还能在学校重复领取伙食补助吗？",
+    "expectedSection": "30",
+    "expectedPage": 33,
+    "mustContain": [
+      "不得",
+      "重复"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "不得在学校重复领取伙食补助。",
+    "expectedEvidence": [
+      {
+        "section": "30",
+        "page": 33,
+        "printedPage": 26
+      }
+    ]
+  },
+  {
+    "id": "meal-conference-provided",
+    "question": "按本指南，异地会议会务费已经包含伙食费用，还能按整个参会期间发放伙食补助吗？",
+    "expectedSection": "30",
+    "expectedPage": 33,
+    "mustContain": [
+      "在途"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "不能按整个参会期间重复发放，只发放在途期间伙食补助。",
+    "expectedEvidence": [
+      {
+        "section": "30",
+        "page": 33,
+        "printedPage": 26
+      }
+    ]
+  },
+  {
+    "id": "car-rental-round-trip",
+    "question": "按本指南，从常驻地到目的地往返租车，按哪类交通费报销，还发市内交通费吗？",
+    "expectedSection": "31",
+    "expectedPage": 34,
+    "mustContain": [
+      "城市间交通费",
+      "不再"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "视同城市间交通费报销，不再发放市内交通费；应满足本条所列工作需要、手续和票据条件。",
+    "expectedEvidence": [
+      {
+        "section": "31",
+        "page": 34,
+        "printedPage": 27
+      }
+    ]
+  },
+  {
+    "id": "ride-hailing-materials",
+    "question": "按本指南，网约车发票报销需要哪些材料？",
+    "expectedSection": "35",
+    "expectedPage": 36,
+    "mustContain": [
+      "预约报销单",
+      "发票原件",
+      "出行行程单"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "需要预约报销单、发票原件、出行行程单；常驻地以外行程应与外地出差费用一并报销。",
+    "expectedEvidence": [
+      {
+        "section": "35",
+        "page": 36,
+        "printedPage": 29
+      }
+    ]
+  },
+  {
+    "id": "invited-visitor-allowance",
+    "question": "按本指南，邀请校外人员来校交流、访问，报销交通和住宿后，还发伙食补助和市内交通费吗？",
+    "expectedSection": "34",
+    "expectedPage": 36,
+    "mustContain": [
+      "不再发放"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "不再发放伙食补助费和市内交通费；勿与邀请赴外地调研的情形混淆。",
+    "expectedEvidence": [
+      {
+        "section": "34",
+        "page": 36,
+        "printedPage": 29
+      }
+    ]
+  },
+  {
+    "id": "internship-meal-allowance",
+    "question": "按本指南，学生实习期间实行伙食费补贴吗？",
+    "expectedSection": "37",
+    "expectedPage": 39,
+    "mustContain": [
+      "不实行",
+      "伙食费补贴"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "学生实习期间不实行伙食费补贴。",
+    "expectedEvidence": [
+      {
+        "section": "37",
+        "page": 39,
+        "printedPage": 32
+      }
+    ]
+  },
+  {
+    "id": "conference-standard-general",
+    "question": "按本指南，教学行政会议和普通科研会议的综合定额分别是多少？",
+    "expectedSection": "40",
+    "expectedPage": 41,
+    "mustContain": [
+      "550",
+      "750"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "教学行政等会议550元/人·天，普通科研会议750元/人·天。",
+    "expectedEvidence": [
+      {
+        "section": "40",
+        "page": 41,
+        "printedPage": 34
+      }
+    ]
+  },
+  {
+    "id": "conference-standard-foreign-ratio-pass",
+    "question": "按本指南，科研会议12人参加，其中4人为外籍人士，综合定额可适用多少？",
+    "expectedSection": "40",
+    "expectedPage": 41,
+    "mustContain": [
+      "850"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "4名外籍人士达到人数门槛且占12人的三分之一，可适用850元/人·天。",
+    "expectedEvidence": [
+      {
+        "section": "40",
+        "page": 41,
+        "printedPage": 34
+      }
+    ]
+  },
+  {
+    "id": "conference-standard-foreign-ratio-fail",
+    "question": "按本指南，科研会议20人参加，其中4人为外籍人士，综合定额可用850元吗？",
+    "expectedSection": "40",
+    "expectedPage": 41,
+    "mustContain": [
+      "750",
+      "三分之一"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "不能，仅满足外籍人数门槛但占比4/20低于三分之一，适用普通科研会议750元/人·天。",
+    "expectedEvidence": [
+      {
+        "section": "40",
+        "page": 41,
+        "printedPage": 34
+      }
+    ]
+  },
+  {
+    "id": "conference-excluded-items",
+    "question": "按本指南，专家咨询费和参会人员城市间交通费算在会议费综合定额里吗？",
+    "expectedSection": "40",
+    "expectedPage": 41,
+    "mustContain": [
+      "不含",
+      "专家咨询费",
+      "城市间交通费"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "不含专家咨询费、讲课费、参会人员城市间交通费；会议期间交通费与城市间交通费不同。",
+    "expectedEvidence": [
+      {
+        "section": "40",
+        "page": 41,
+        "printedPage": 34
+      }
+    ]
+  },
+  {
+    "id": "advance-domestic-clearance",
+    "question": "按本指南，国内差旅借款应在返校后多久冲账结算？",
+    "expectedSection": "71",
+    "expectedPage": 69,
+    "mustContain": [
+      "一个月"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "出差返校之日起一个月内冲账结算。",
+    "expectedEvidence": [
+      {
+        "section": "71",
+        "page": 69,
+        "printedPage": 62
+      }
+    ]
+  },
+  {
+    "id": "reimbursement-progress-guide",
+    "question": "按本指南，我应该在哪里查看报销进度？",
+    "expectedSection": "74",
+    "expectedPage": 70,
+    "mustContain": [
+      "网上预约报账",
+      "历史报销单"
+    ],
+    "answerable": true,
+    "shouldRetrieve": true,
+    "expectedAction": "answer",
+    "expectedAnswer": "登录财务综合管理平台，进入网上预约报账—历史报销单，查看报销单状态和预约物流信息；这里只说明查询方法，不读取个人真实进度。",
+    "expectedEvidence": [
+      {
+        "section": "74",
+        "page": 70,
+        "printedPage": 63
+      }
+    ]
+  },
+  {
+    "id": "unknown-childcare",
+    "question": "仅凭本指南，出差期间临时雇请人员照看孩子的儿童托管费，可以作为国内差旅费报销吗？",
+    "mustContain": [
+      "未明确"
+    ],
+    "answerable": false,
+    "shouldRetrieve": true,
+    "expectedAction": "abstain",
+    "expectedAnswer": "本指南未明确规定该类出差临时儿童托管费能否作为差旅费报销。第26项是教职工子女保育费，不能据此将临时托管费认定为差旅费可报，也不能断言一律禁止。",
+    "relatedEvidence": [
+      {
+        "section": "26",
+        "page": 29,
+        "printedPage": 22
+      },
+      {
+        "section": "26",
+        "page": 30,
+        "printedPage": 23
+      }
+    ]
+  },
+  {
+    "id": "private-vacation",
+    "question": "仅凭本指南，个人休假自行入住酒店的住宿费能报销吗？",
+    "answerable": false,
+    "shouldRetrieve": true,
+    "expectedAction": "abstain",
+    "expectedAnswer": "本指南没有足以直接判定普通个人休假住宿费报销资格的明确条款，不能套用国内差旅住宿限额或教职工疗休养政策；应说明证据不足并建议核实适用制度。"
+  },
+  {
+    "id": "unknown-pet-boarding",
+    "question": "仅凭本指南，出差期间宠物寄养费能报销吗？",
+    "answerable": false,
+    "shouldRetrieve": true,
+    "expectedAction": "abstain",
+    "expectedAnswer": "本指南未明确规定出差期间宠物寄养费的报销资格，不能编造补助标准，也不能将未规定等同于明文禁止。"
+  },
+  {
+    "id": "hotel-limit-shanghai-p6",
+    "question": "P6员工去上海出差，酒店最多能报销多少？",
+    "expectedSection": "28",
+    "expectedPage": 31,
+    "answerable": false,
+    "shouldRetrieve": true,
+    "expectedAction": "clarify",
+    "expectedAnswer": "本指南按一、二、三类人员及科研经费条件区分标准，未给出P6职级对应关系。应询问人员类别或职称岗位、经费性质，再确定限额；不能凭P6推断700元。",
+    "expectedEvidence": [
+      {
+        "section": "28",
+        "page": 31,
+        "printedPage": 24
+      },
+      {
+        "section": "29",
+        "page": 32,
+        "printedPage": 25
+      },
+      {
+        "section": "第三部分/国内差旅住宿费限额标准表",
+        "page": 79,
+        "printedPage": 72
+      }
+    ]
+  },
+  {
+    "id": "hotel-shanghai-missing-category",
+    "question": "按本指南，我去上海出差，住宿最多能报销多少？",
+    "expectedSection": "第三部分/国内差旅住宿费限额标准表",
+    "expectedPage": 79,
+    "answerable": false,
+    "shouldRetrieve": true,
+    "expectedAction": "clarify",
+    "expectedAnswer": "应先确认一、二、三类人员类别及是否使用科研项目经费；可列出各类基准作条件说明，但不能给出单一确定限额。",
+    "expectedEvidence": [
+      {
+        "section": "第三部分/国内差旅住宿费限额标准表",
+        "page": 79,
+        "printedPage": 72
+      },
+      {
+        "section": "29",
+        "page": 32,
+        "printedPage": 25
+      }
+    ]
+  },
+  {
+    "id": "invoice-electronic-500-conflict",
+    "question": "仅按本指南，恰好500元的电子发票，书面承诺不重复报销后能免认证吗？",
+    "expectedSection": "5",
+    "expectedPage": 11,
+    "mustContain": [
+      "500",
+      "500元及以上"
+    ],
+    "answerable": false,
+    "shouldRetrieve": true,
+    "expectedAction": "escalate",
+    "expectedAnswer": "第5项写500元以内可书面承诺后免认证，第12项写500元及以上须认证、500元以下可书面承诺。500元边界表述冲突，应同时指出两处证据并请财务确认，不能自行宣称其中一条具有优先效力。",
+    "expectedEvidence": [
+      {
+        "section": "5",
+        "page": 11,
+        "printedPage": 4
+      },
+      {
+        "section": "12",
+        "page": 16,
+        "printedPage": 9
+      }
+    ]
+  },
+  {
+    "id": "payment-1000-conflict",
+    "question": "仅按本指南，单张发票恰好1000元时，是否必须提供银行支付记录？",
+    "expectedSection": "8",
+    "expectedPage": 13,
+    "mustContain": [
+      "1000",
+      "以上",
+      "及以上"
+    ],
+    "answerable": false,
+    "shouldRetrieve": true,
+    "expectedAction": "escalate",
+    "expectedAnswer": "第8项结算说明写超过1000元，第12项通用材料表写1000元及以上。两处门槛在1000元处不一致，应说明差异并向财务核实，不能自行选择一处作为无争议结论。",
+    "expectedEvidence": [
+      {
+        "section": "8",
+        "page": 13,
+        "printedPage": 6
+      },
+      {
+        "section": "12",
+        "page": 16,
+        "printedPage": 9
+      }
+    ]
+  },
+  {
+    "id": "hotel-current-policy-2026",
+    "question": "2026年4月12日，浙江大学三类人员去上海出差，现行住宿费上限是多少？不要只告诉我旧版规定。",
+    "validOn": "2026-04-12",
+    "expectedSection": "第三部分/国内差旅住宿费限额标准表",
+    "expectedPage": 79,
+    "answerable": false,
+    "shouldRetrieve": true,
+    "expectedAction": "abstain",
+    "expectedAnswer": "所提供指南出版于2020年11月，不能仅凭它确认2026年4月12日现行标准。可明确标为旧版信息说明三类基准500元/人天，但不能宣称该数字在所问日期仍有效；应核实最新制度。",
+    "expectedEvidence": [
+      {
+        "section": "第三部分/国内差旅住宿费限额标准表",
+        "page": 79,
+        "printedPage": 72
+      },
+      {
+        "section": "封面/出版日期",
+        "page": 1,
+        "printedPage": null
+      }
+    ]
+  },
+  {
+    "id": "personal-monthly-spending",
+    "question": "我这个月花了多少钱？",
+    "answerable": false,
+    "shouldRetrieve": false,
+    "expectedAction": "route_to_ledger_query",
+    "expectedAnswer": "转到个人账本统计功能，依据交易记录统计用户时区本月支出；没有账本数据时说明缺少记录或请求数据，不能从指南推算个人花费。"
+  },
+  {
+    "id": "record-hotel-expense",
+    "question": "帮我记录一笔酒店支出。",
+    "answerable": false,
+    "shouldRetrieve": false,
+    "expectedAction": "route_to_expense_record",
+    "expectedAnswer": "转到账本记账功能；当前未提供金额、日期等必要信息，应补齐后记录，不得检索指南代替记账或声称已记录。"
+  },
+  {
+    "id": "invoice-amount-extraction",
+    "question": "这张发票金额是多少？",
+    "answerable": false,
+    "shouldRetrieve": false,
+    "expectedAction": "route_to_invoice_extraction",
+    "expectedAnswer": "转到发票图像或文件金额识别功能；当前测试仅含文本问题且未附发票，应请求提供发票，不得将指南中的示例金额当作该发票金额。"
+  }
+]

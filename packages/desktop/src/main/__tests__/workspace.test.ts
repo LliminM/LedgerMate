@@ -63,6 +63,11 @@ describe("ensureWorkspace()", () => {
     expect(existsSync(join(BASE, "files"))).toBe(true);
   });
 
+  test("should create the local Chroma data directory", async () => {
+    await ensureWorkspace();
+    expect(existsSync(join(BASE, "rag", "chroma"))).toBe(true);
+  });
+
   test("should write main.journal with header and include directives", async () => {
     await ensureWorkspace();
     const content = readFileSync(join(BASE, "ledger", "main.journal"), "utf-8");
@@ -132,6 +137,7 @@ describe("ensureWorkspace()", () => {
     await ensureWorkspace();
     const content = readFileSync(join(BASE, ".gitignore"), "utf-8");
     expect(content).toContain("auth.json");
+    expect(content).toContain("rag/chroma/");
   });
 
   test("should produce an output file for every template file", async () => {

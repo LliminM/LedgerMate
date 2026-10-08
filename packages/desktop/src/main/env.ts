@@ -55,6 +55,12 @@ export function appSettingsPath(): string {
   return path.join(workspaceDir(), "app-settings.json");
 }
 
+/** Persistent local Chroma data. It is a rebuildable index, so the workspace
+ *  git repository ignores this directory (see template/.gitignore). */
+export function chromaDataDir(): string {
+  return path.join(workspaceDir(), "rag", "chroma");
+}
+
 /** Dir holding vendored bin/ + tessdata/ + the extension bundle.
  *  Dev: packages/desktop/resources. Packaged: the app's resources dir
  *  (electron-builder extraResources land directly under it). */

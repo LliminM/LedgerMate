@@ -7,6 +7,7 @@ import { killAllAgents, registerAgentIpc } from "./agent/router";
 import { registerSessionsIpc } from "./agent/sessions";
 import { registerSkillsIpc } from "./agent/skills";
 import { initAnalytics, registerAnalyticsIpc, trackLaunch, trackQuit } from "./analytics";
+import { localChromaServer } from "./chroma/server";
 import { applyWorkspaceFlag } from "./cli";
 import { workspaceDir } from "./env";
 import { registerFilesIpc } from "./files";
@@ -81,6 +82,16 @@ app.whenReady().then(async () => {
     console.error("[workspace] setup failed:", err);
   }
 
+  // Chroma is an optional local capability: a startup failure must not make
+  // the existing accounting app unusable, but a ready server is exposed to
+  // every subsequently forked agent host through agentEnv().
+  try {
+    const chroma = await localChromaServer.start();
+    console.log(`[chroma] ready at ${chroma.url}`);
+  } catch (err) {
+    console.error("[chroma] startup failed; RAG is unavailable:", err);
+  }
+
   // Dev only: packaged builds get the icon from build/icon.icns, but
   // `electron-vite dev` runs the stock Electron binary with its default icon.
   // The red "dev" badge marks the dev instance so it can't be confused with
@@ -132,4 +143,5 @@ app.on("window-all-closed", () => {
 app.on("before-quit", () => {
   trackQuit();
   killAllAgents();
+  localChromaServer.stop();
 });
