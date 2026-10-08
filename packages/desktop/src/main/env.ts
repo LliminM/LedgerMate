@@ -99,6 +99,11 @@ export function nativeSkillsDir(): string {
   return path.join(resourceDir(), "skills");
 }
 
+/** Built-in reimbursement policies consumed by the RAG indexer. */
+export function policiesDir(): string {
+  return path.join(resourceDir(), "policies");
+}
+
 /** Built agent-host utilityProcess entry — emitted as a sibling of the main
  *  bundle (out/main/agent-host.js) in both dev and packaged builds, so it
  *  resolves relative to this module's own URL. */
@@ -133,5 +138,7 @@ export function agentEnv(): NodeJS.ProcessEnv {
   if (existsSync(bin)) env.PATH = `${bin}${path.delimiter}${env.PATH ?? ""}`;
   const tessdata = path.join(res, "tessdata");
   if (existsSync(tessdata)) env.TESSDATA_PREFIX = tessdata;
+  const policies = policiesDir();
+  if (existsSync(policies)) env.ACCOUNTANT24_POLICY_DIR = policies;
   return env;
 }

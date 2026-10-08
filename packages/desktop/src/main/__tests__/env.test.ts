@@ -226,6 +226,18 @@ describe("agentEnv()", () => {
       Object.defineProperty(process, "resourcesPath", { value: origRes, configurable: true });
     }
   });
+
+  it("should expose bundled policies to the agent host when present", async () => {
+    const origRes = process.resourcesPath;
+    Object.defineProperty(process, "resourcesPath", { value: "/pkg-res", configurable: true });
+    h.existsSync.mockImplementation((p: string) => p === `/pkg-res${path.sep}policies`);
+    try {
+      const mod = await import("../env");
+      expect(mod.agentEnv().ACCOUNTANT24_POLICY_DIR).toBe("/pkg-res/policies");
+    } finally {
+      Object.defineProperty(process, "resourcesPath", { value: origRes, configurable: true });
+    }
+  });
 });
 
 describe("systemPromptPath()", () => {
@@ -248,6 +260,19 @@ describe("nativeSkillsDir()", () => {
     try {
       const mod = await import("../env");
       expect(mod.nativeSkillsDir()).toBe("/pkg-res/skills");
+    } finally {
+      Object.defineProperty(process, "resourcesPath", { value: orig, configurable: true });
+    }
+  });
+});
+
+describe("policiesDir()", () => {
+  it("should resolve the policies dir in packaged resources", async () => {
+    const orig = process.resourcesPath;
+    Object.defineProperty(process, "resourcesPath", { value: "/pkg-res", configurable: true });
+    try {
+      const mod = await import("../env");
+      expect(mod.policiesDir()).toBe("/pkg-res/policies");
     } finally {
       Object.defineProperty(process, "resourcesPath", { value: orig, configurable: true });
     }

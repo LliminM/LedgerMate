@@ -35,10 +35,10 @@ function createMockPi() {
 }
 
 describe("accountant24Extension()", () => {
-  test("should register 8 custom tools (built-ins are pi's own)", () => {
+  test("should register 9 custom tools (built-ins are pi's own)", () => {
     const pi = createMockPi();
     accountant24Extension(pi as any);
-    expect(pi.registerTool).toHaveBeenCalledTimes(8);
+    expect(pi.registerTool).toHaveBeenCalledTimes(9);
   });
 
   test("should register tool_call and before_agent_start handlers", () => {

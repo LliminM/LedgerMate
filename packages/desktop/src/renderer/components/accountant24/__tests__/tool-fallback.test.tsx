@@ -37,6 +37,10 @@ describe("toolLabel()", () => {
       expect(toolLabel("extract_text")).toBe("Extract Text");
     });
 
+    it("should return 'Search Reimbursement Guideline' for policy retrieval", () => {
+      expect(toolLabel("search_reimbursement_guideline")).toBe("Search Reimbursement Guideline");
+    });
+
     it("should return 'Validate Ledger' when toolName is 'validate'", () => {
       expect(toolLabel("validate")).toBe("Validate Ledger");
     });

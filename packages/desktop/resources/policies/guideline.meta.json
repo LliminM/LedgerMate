@@ -6,5 +6,7 @@
   "effectiveFrom": "2026-01-01",
   "effectiveTo": null,
   "jurisdiction": "CN",
-  "policyType": "general"
+  "policyType": "general",
+  "contentStartPage": 8,
+  "printedPageOffset": 7
 }
