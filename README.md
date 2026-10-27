@@ -1,140 +1,86 @@
-# Accountant24 - Local-first AI agent for personal finance
+# LedgerMate
 
-Track spending in plain language, import bank statements and receipts, ask questions about your money. Your data stays as plain text files on your machine. Works with any LLM, including local ones. All changes are versioned with git.
+**本地优先的 AI 记账 Agent。** 用自然语言记录收支、导入账单与票据、查询账本，无需手写复式记账分录。
 
-https://github.com/user-attachments/assets/3ed64e5f-865b-4246-b855-71ea35046552
+LedgerMate 基于 [accountant24](https://github.com/machulav/accountant24) 开发，保留其纯文本账本和桌面端记账流程，并增加报销制度 RAG、分层记忆、本地运行 Trace 等能力。
 
-<p align="center">
-  <a href="https://github.com/machulav/accountant24/releases/latest/download/Accountant24.dmg"><b>Download for macOS</b></a> (Apple Silicon)
-</p>
+## 功能
 
-## What you can do
+- **自然语言记账：**描述消费、转账、退款或账户余额，由 Agent 生成结构化分录，并使用 hledger 校验和查询账本。
+- **账单与票据导入：**解析 PDF 账单、发票及票据图片，将原始文件保存在工作区，便于回溯。
+- **财务查询：**询问支出、交易记录、账户余额与净资产；账本是金额和交易信息的依据。
+- **报销制度问答：**检索项目内置的报销制度，结合条款和页码回答政策问题。
+- **可扩展 Skills：**使用内置或自定义 Agent Skills，复用周期性财务分析等流程。
+- **Git 留痕：**账本以纯文本保存，可使用 Git 查看与追踪变更。
 
-### Log spending in natural language
+## Agent 设计
 
-> I spent $45 at Whole Foods yesterday
+### 报销制度 RAG
 
-The agent figures out the details and adds it to your ledger as a proper double-entry transaction.
+系统解析内置报销制度 PDF，按条款切分文本并设置重叠区，将 Embedding 写入本地 Chroma 索引。Agent 通过 `search_reimbursement_guideline` 工具检索相关内容，获得条款、PDF 页码和印刷页码；回答政策问题时需引用检索证据，证据不足时明确说明。
 
-### Import bank statements and receipts
+当前使用 `text-embedding-v4` 与余弦相似度进行向量检索。制度文件、文档版本、切分版本或 Embedding 配置变化时会重建索引。**目前尚未实现 BM25 与 RRF 混合检索。**
 
-> Here is my March bank statement, please add missing transactions: ~/Downloads/statement-march.pdf
+### 分层记忆
 
-> Add transaction from this receipt: ~/Desktop/receipt.jpg
+| 层级 | 作用 | 实现 |
+| --- | --- | --- |
+| L0：会话上下文 | 保持当前对话连贯 | pi 会话历史与自动上下文压缩 |
+| L1：长期记忆 | 保存用户偏好、长期规则等稳定信息 | `memory.md`，每轮读取并注入上下文 |
+| L2：情景记忆 | 跨会话回忆相关事件和经历 | `memories/` 中的 Markdown 文件；回答前通过轻量查询选取最多 3 条相关记忆 |
 
-Drop a PDF bank statement, an invoice, or a photo of a paper receipt into the chat. The agent extracts the text, pulls out every transaction, and adds them to your ledger. The original file is archived in your workspace so you can refer back to it later.
+每轮 Agent 运行结束后，后台任务会抽取或更新情景记忆。记忆写入经过串行调度和原子落盘；**已抽取内容的写盘失败**会进入重试队列。工具调用拦截器阻止 Agent 直接改写情景记忆文件，也限制对已有长期记忆的整体覆写。
 
-### Ask questions about your money
+### 多会话运行时与异常恢复
 
-> How much did I spend on food this month?
+Electron `utilityProcess` 为每个聊天维护独立的 pi Runtime。应用按会话路由命令和流式事件，对同一会话的命令串行处理，并回收空闲 Runtime；会话历史由 pi 持久化，回收 Runtime 不会删除聊天记录。
 
-> What's my net worth?
+对于上下文溢出后的压缩与重试，UI 会暂存可能恢复的瞬时错误：恢复成功则消除误报，恢复失败则显示错误。同时同步压缩状态，避免切换聊天后状态失真或消息列表跳动。
 
-> Show me all transactions from my last trip to Italy
+### 本地 Trace
 
-The agent checks your ledger and gives you a clear answer. Type `@` to point it at a specific account, payee, or tag.
+Agent 运行过程以 JSONL 记录在本地，包含 LLM 调用、工具执行、自动重试和上下文压缩等 Span。Trace 记录耗时、首 Token 延迟、Token 用量、成本和工具错误数，便于定位运行瓶颈。默认不保存 Prompt、思考内容、工具参数和结果原文；Trace 写入失败也不会中断 Agent，`traces/` 默认不纳入工作区 Git 仓库。
 
-### Teach the agent as you go
+## RAG 检索评测
 
-> I'm visiting Italy from April 10th to 15th.
-> Tag all transactions during this period with the 'trip_italy' tag.
+在一份报销制度文档、**44 条带条款和页码证据标注的问题**上，索引包含 **274 个文本块**。一次已有实验的 Top-5 检索结果如下：
 
-> My food budget is $600/month, please notify me when I get close.
+| 指标 | 结果 |
+| --- | ---: |
+| Hit@5 | 100%（44/44） |
+| 宏平均 Recall@5 | 96.97% |
+| MRR@5 | 0.8485 |
 
-Tell the agent once — it remembers and applies it when it matters.
+这些是**证据检索指标**，不代表 Agent 最终回答的准确率。仓库包含[评测题集](packages/pi-extension/src/rag/evals/guideline-cases.json)和[指标计算代码](packages/pi-extension/src/rag/evals/metrics.ts)。设置 `DASHSCOPE_API_KEY` 和对应地域的 HTTPS OpenAI 兼容接口地址 `DASHSCOPE_BASE_URL` 后，可重新运行：
 
-### Extend the agent with skills
+```sh
+npm run eval:rag
+```
 
-> Which subscriptions can I cancel?
+脚本会启动临时 Chroma 索引，并将 JSON、Markdown 报告写入 `rag-eval-results/`。该目录是本地生成结果，不提交到仓库。
 
-> Create a skill that compares my spending this month to the previous month and shows where I spent more.
+## 从源码运行
 
-Skills are reusable playbooks the agent follows step by step, like monthly reviews or subscription audits. Use the built-in ones or create your own.
+桌面端目前面向 macOS 开发。安装 Node.js 22 或更新版本，以及记账和文档解析所需的本地工具：
 
-### Track every change with git
+```sh
+brew install hledger poppler tesseract
+npm ci
+npm start
+```
 
-> What did you change today?
+首次启动后，在应用中连接云端模型，或选择 Ollama 本地模型。普通记账功能不依赖 `DASHSCOPE_*` 配置；使用报销制度检索时，还需在启动应用前配置上述两个环境变量。使用云端模型或 Embedding 服务时，发送给服务的内容会离开本机；账本、记忆、会话和 Trace 保存在本地工作区。
 
-> Undo the last change.
+当前源码包名、应用打包名称及默认工作区路径仍沿用原项目的 `Accountant24` 标识，默认工作区为 `~/.accountant24`。LedgerMate 是此分支的项目名称，应用内部标识尚未全部更改。
 
-Every modification is auto-committed to a local git repo. Review your history anytime, roll back mistakes, or push to a private repo for backup.
+## 技术栈
 
-## Quick start
+TypeScript、Electron、React、pi Agent SDK、TypeBox、hledger、ChromaDB、阿里云 Embedding、Git、Vitest、Playwright。
 
-1. Download [Accountant24](https://github.com/machulav/accountant24/releases/latest/download/Accountant24.dmg) for Apple Silicon Macs and install it.
-2. Launch Accountant24.
-3. Connect your LLM provider.
-4. Pick your favorite model and start chatting.
+## 许可证
 
-## Go fully local
+项目沿用 [Apache 2.0 许可证](LICENSE)。原作者版权声明见 [NOTICE](NOTICE)，打包的第三方工具另附许可证信息。
 
-Want your financial data to never leave your machine? Run a local model with Ollama.
+## 致谢
 
-1. [Download and install Ollama](https://ollama.com/download).
-2. Pull a Gemma 4 or any other model:
-
-   ```bash
-   ollama pull gemma4:31b  # requires ~24 GB+ RAM
-   ```
-
-3. In Settings → Providers, connect Ollama. The app detects all your local Ollama models and configures them automatically.
-4. Pick your Gemma 4 model and start chatting.
-
-## How it compares
-
-|                 | Accountant24               | YNAB / Monarch     | Actual Budget      | hledger CLI              |
-| --------------- | -------------------------- | ------------------ | ------------------ | ------------------------ |
-| Data format     | Plain text (hledger)       | Proprietary cloud  | SQLite             | Plain text (hledger)     |
-| Data location   | Your machine               | Their servers      | Your machine       | Your machine             |
-| Input method    | Natural language           | Manual entry       | Manual entry       | Manual entry             |
-| AI              | Built-in, learns over time | —                  | —                  | —                        |
-| Memory          | Persistent                 | —                  | —                  | —                        |
-| Skills          | Built-in + custom          | —                  | —                  | —                        |
-| Version control | Git, built-in              | —                  | —                  | Via manual setup         |
-| Accounting      | Double-entry bookkeeping   | Envelope budgeting | Envelope budgeting | Double-entry bookkeeping |
-| Multi-currency  | Yes                        | —                  | —                  | Yes                      |
-| Bank sync       | —                          | Yes                | Yes (via add-ons)  | —                        |
-| Interface       | Desktop app                | Web + mobile       | Web + desktop      | CLI                      |
-| Price           | Free                       | $100–$180/yr       | Free               | Free                     |
-| Lock-in         | None (plain text)          | High               | Medium             | None (plain text)        |
-
-## Why I built this
-
-For years, I managed my personal finances with YNAB. It worked — but every transaction was a manual chore. I'd fall behind, dread catching up, and put it off for weeks at a time.
-
-One weekend I started playing with hledger and Claude Code, just to see if an agent could handle the bookkeeping for me. I wrote a couple of small skills, and to my surprise, it actually worked — and it was genuinely fun to use.
-
-So I kept going. I packed everything into a standalone agent, tuned it for this one job, and started using it every day. I'm honestly happier with it than any tool I've used for my money before.
-
-If it works this well for me, maybe it'll work for you too. That's why I'm releasing it as an open source project.
-
-## Why this stack
-
-Each piece of this puzzle does one thing really well.
-
-**hledger** is a mature accounting engine with proper double-entry bookkeeping. It's fast, reliable, and stores everything in plain text files you fully own. The catch: it has a steep learning curve — journal syntax, report commands, filter expressions. Not something most people want to deal with.
-
-**LLMs** are great at understanding what you mean in plain language. But they hallucinate numbers and can't do accounting on their own. Left alone with a ledger, they'd quietly corrupt your books.
-
-**pi** is the agent framework that glues everything together — sessions, tool execution, LLM communication. It's small, well-designed, and easy to extend.
-
-**git** tracks every change to plain text files — which is exactly what a ledger is. The agent commits your changes as you go, so mistakes are easy to undo, and pushing to a private remote gives you backups.
-
-Put them together and each piece covers the other's weakness. You speak naturally, the LLM figures out what you mean, hledger keeps the math honest, git makes every change traceable, and pi orchestrates the whole thing. That's the combination I ended up with after trying a few alternatives — and it's been working well ever since.
-
-## Credits
-
-Accountant24 wouldn't exist without these projects:
-
-- **[pi](https://github.com/badlogic/pi-mono)** by [Mario Zechner](https://github.com/badlogic) — a minimal but powerful framework for building AI agents.
-- **[hledger](https://hledger.org)** by [Simon Michael](https://github.com/simonmichael) — the accounting engine that makes proper double-entry bookkeeping possible.
-
-Both are remarkable pieces of software.
-
-## Contributing
-
-This is a personal project I use every day, and I'd love to hear from anyone else using it. Bug reports, ideas, feedback, pull requests — all welcome. If you're planning a bigger change, open an issue first so we can talk it through.
-
-## License
-
-[Apache 2.0](LICENSE)
+LedgerMate 基于 [**machulav**](https://github.com/machulav) 开源的 [**accountant24**](https://github.com/machulav/accountant24) 开发。原项目提供了本地优先的桌面应用、记账流程，以及 pi 与 hledger 的基础架构；LedgerMate 在此基础上增加 RAG、分层记忆、可观测性等能力。感谢 machulav 创建并开源 accountant24。
