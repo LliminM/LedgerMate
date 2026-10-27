@@ -85,6 +85,21 @@ describe("buildContextSection()", () => {
     expect(section).toContain("\n\n<memory>\n- Rent is $2100\n</memory>");
   });
 
+  test("should omit episodic memory tags when no files were selected", () => {
+    expect(buildContextSection(empty)).not.toContain("<episodic_memories>");
+  });
+
+  test("should include each selected episodic file verbatim in a temporary context block", () => {
+    const content = "---\nname: coat\ntype: event\ndescription: A coat\n---\n\nBought in Hangzhou.\n";
+    const section = buildContextSection({
+      ...empty,
+      episodicMemories: [{ filename: "coat.md", content }],
+    });
+    expect(section).toContain(
+      `<episodic_memories>\n<episodic_memory filename="coat.md">\n${content}\n</episodic_memory>\n</episodic_memories>`,
+    );
+  });
+
   test("should render fallback messages for empty accounts, payees, and tags", () => {
     const section = buildContextSection(empty);
     expect(section).toContain("<accounts>\nNo accounts found.\n</accounts>");

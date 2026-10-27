@@ -7,10 +7,16 @@ import { join } from "node:path";
 const envHome = process.env.ACCOUNTANT24_WORKSPACE;
 export let ACCOUNTANT24_WORKSPACE = envHome && envHome.length > 0 ? envHome : join(homedir(), ".accountant24");
 export let MEMORY_PATH = join(ACCOUNTANT24_WORKSPACE, "memory.md");
+export let EPISODIC_MEMORY_DIR = join(ACCOUNTANT24_WORKSPACE, "memories");
+export let EPISODIC_MEMORY_INDEX_PATH = join(EPISODIC_MEMORY_DIR, "MEMORY.md");
+export let EPISODIC_MEMORY_PENDING_PATH = join(EPISODIC_MEMORY_DIR, ".pending-writes.json");
 export let LEDGER_DIR = join(ACCOUNTANT24_WORKSPACE, "ledger");
 
 export function setBaseDir(dir: string): void {
   ACCOUNTANT24_WORKSPACE = dir;
   MEMORY_PATH = join(dir, "memory.md");
+  EPISODIC_MEMORY_DIR = join(dir, "memories");
+  EPISODIC_MEMORY_INDEX_PATH = join(EPISODIC_MEMORY_DIR, "MEMORY.md");
+  EPISODIC_MEMORY_PENDING_PATH = join(EPISODIC_MEMORY_DIR, ".pending-writes.json");
   LEDGER_DIR = join(dir, "ledger");
 }

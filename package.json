@@ -16,6 +16,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
+    "eval:rag": "npm run eval:rag -w @accountant24/pi-extension",
     "e2e": "playwright test",
     "docs": "sh scripts/docs.sh",
     "audit": "npm audit --audit-level=moderate",

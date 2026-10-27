@@ -12,4 +12,5 @@ export const TOOL_LABELS: Record<string, string> = {
   search_reimbursement_guideline: "Search Reimbursement Guideline",
   validate: "Validate Ledger",
   commit_and_push: "Commit",
+  delete_episodic_memory: "Forget Memory",
 };

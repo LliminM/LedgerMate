@@ -1,7 +1,15 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { ACCOUNTANT24_WORKSPACE, LEDGER_DIR, MEMORY_PATH, setBaseDir } from "../config";
+import {
+  ACCOUNTANT24_WORKSPACE,
+  EPISODIC_MEMORY_DIR,
+  EPISODIC_MEMORY_INDEX_PATH,
+  EPISODIC_MEMORY_PENDING_PATH,
+  LEDGER_DIR,
+  MEMORY_PATH,
+  setBaseDir,
+} from "../config";
 
 const originalHome = join(homedir(), ".accountant24");
 
@@ -24,6 +32,13 @@ describe("config defaults", () => {
     setBaseDir(originalHome);
     expect(LEDGER_DIR).toBe(join(homedir(), ".accountant24", "ledger"));
   });
+
+  test("should set episodic memory paths below ~/.accountant24/memories", () => {
+    setBaseDir(originalHome);
+    expect(EPISODIC_MEMORY_DIR).toBe(join(homedir(), ".accountant24", "memories"));
+    expect(EPISODIC_MEMORY_INDEX_PATH).toBe(join(homedir(), ".accountant24", "memories", "MEMORY.md"));
+    expect(EPISODIC_MEMORY_PENDING_PATH).toBe(join(homedir(), ".accountant24", "memories", ".pending-writes.json"));
+  });
 });
 
 describe("ACCOUNTANT24_WORKSPACE env var (module eval)", () => {
@@ -39,6 +54,9 @@ describe("ACCOUNTANT24_WORKSPACE env var (module eval)", () => {
     expect(config.ACCOUNTANT24_WORKSPACE).toBe("/tmp/env-home");
     expect(config.MEMORY_PATH).toBe(join("/tmp/env-home", "memory.md"));
     expect(config.LEDGER_DIR).toBe(join("/tmp/env-home", "ledger"));
+    expect(config.EPISODIC_MEMORY_DIR).toBe(join("/tmp/env-home", "memories"));
+    expect(config.EPISODIC_MEMORY_INDEX_PATH).toBe(join("/tmp/env-home", "memories", "MEMORY.md"));
+    expect(config.EPISODIC_MEMORY_PENDING_PATH).toBe(join("/tmp/env-home", "memories", ".pending-writes.json"));
   });
 
   test("should fall back to ~/.accountant24 when ACCOUNTANT24_WORKSPACE is empty", async () => {
@@ -63,5 +81,12 @@ describe("setBaseDir()", () => {
   test("should update LEDGER_DIR to dir/ledger", () => {
     setBaseDir("/tmp/test-dir");
     expect(LEDGER_DIR).toBe("/tmp/test-dir/ledger");
+  });
+
+  test("should update episodic memory paths to dir/memories", () => {
+    setBaseDir("/tmp/test-dir");
+    expect(EPISODIC_MEMORY_DIR).toBe("/tmp/test-dir/memories");
+    expect(EPISODIC_MEMORY_INDEX_PATH).toBe("/tmp/test-dir/memories/MEMORY.md");
+    expect(EPISODIC_MEMORY_PENDING_PATH).toBe("/tmp/test-dir/memories/.pending-writes.json");
   });
 });

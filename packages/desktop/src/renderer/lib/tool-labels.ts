@@ -14,6 +14,7 @@ export const TOOL_LABELS: Record<string, string> = {
   search_reimbursement_guideline: "Search Reimbursement Guideline",
   validate: "Validate Ledger",
   commit_and_push: "Commit",
+  delete_episodic_memory: "Forget Memory",
 
   // pi's built-in tools — pi only carries lowercase raw names for these, so
   // they are labeled here, renderer-side only.

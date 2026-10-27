@@ -9,6 +9,8 @@ const BASE = mkdtempSync(join(tmpdir(), "accountant24-ext-"));
 // No mock.module calls — use real modules to avoid mock leaks.
 // Extension tests work with real modules + temp filesystem via setBaseDir.
 const { createAccountantExtension } = await import("../extension.js");
+const { episodicMemoryCoordinator } = await import("../episodic-memory/coordinator.js");
+const { findMemoryByName, writeMemory } = await import("../episodic-memory/store.js");
 
 const accountant24Extension = createAccountantExtension;
 
@@ -27,6 +29,7 @@ function createMockPi() {
   const handlers: Record<string, AnyFn> = {};
   return {
     registerTool: vi.fn(() => {}),
+    appendEntry: vi.fn(() => {}),
     on: vi.fn((event: string, handler: AnyFn) => {
       handlers[event] = handler;
     }),
@@ -35,18 +38,19 @@ function createMockPi() {
 }
 
 describe("accountant24Extension()", () => {
-  test("should register 9 custom tools (built-ins are pi's own)", () => {
+  test("should register 10 custom tools (built-ins are pi's own)", () => {
     const pi = createMockPi();
     accountant24Extension(pi as any);
-    expect(pi.registerTool).toHaveBeenCalledTimes(9);
+    expect(pi.registerTool).toHaveBeenCalledTimes(10);
   });
 
-  test("should register tool_call and before_agent_start handlers", () => {
+  test("should register tool_call, before_agent_start, and agent_settled handlers", () => {
     const pi = createMockPi();
     accountant24Extension(pi as any);
-    expect(pi.on).toHaveBeenCalledTimes(2);
+    expect(pi.on).toHaveBeenCalledTimes(3);
     expect(pi.handlers.tool_call).toBeDefined();
     expect(pi.handlers.before_agent_start).toBeDefined();
+    expect(pi.handlers.agent_settled).toBeDefined();
   });
 });
 
@@ -205,5 +209,144 @@ describe("before_agent_start handler", () => {
     const contextPos = prompt.indexOf("<context>");
     expect(cwdPos).toBeLessThan(toolsPos);
     expect(toolsPos).toBeLessThan(contextPos);
+  });
+
+  test("should inject only episodic files selected by the side-query", async () => {
+    await writeMemory({
+      name: "zara-coat",
+      type: "transaction-context",
+      description: "ZARA coat bought in Hangzhou",
+      body: "The user bought a coat at ZARA in Hangzhou.",
+    });
+    await writeMemory({
+      name: "beijing-trip",
+      type: "event",
+      description: "A trip to Beijing",
+      body: "The user visited Beijing.",
+    });
+    const pi = createMockPi();
+    accountant24Extension(pi as any);
+    const complete = vi.fn().mockResolvedValue({
+      content: [{ type: "text", text: '["zara-coat.md"]' }],
+      stopReason: "stop",
+    });
+    const context = {
+      model: { id: "test-model" },
+      modelRegistry: { complete },
+      sessionManager: { getBranch: () => [] },
+    };
+
+    const result = await pi.handlers.before_agent_start(
+      { ...beforeEvent, prompt: "Where did I buy the coat?" },
+      context,
+    );
+    await episodicMemoryCoordinator.idle();
+
+    expect(result.systemPrompt).toContain('<episodic_memory filename="zara-coat.md">');
+    expect(result.systemPrompt).toContain("The user bought a coat at ZARA in Hangzhou.");
+    expect(result.systemPrompt).not.toContain("The user visited Beijing.");
+  });
+
+  test("should let the turn continue when a queued retry file is malformed", async () => {
+    mkdirSync(join(BASE, "memories"), { recursive: true });
+    writeFileSync(join(BASE, "memories", ".pending-writes.json"), "invalid json");
+    const pi = createMockPi();
+    accountant24Extension(pi as any);
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const context = {
+      model: { id: "test-model" },
+      modelRegistry: { complete: vi.fn() },
+      sessionManager: { getBranch: () => [] },
+    };
+
+    const result = await pi.handlers.before_agent_start({ ...beforeEvent, prompt: "Hello" }, context);
+    await episodicMemoryCoordinator.idle();
+
+    expect(result.systemPrompt).toContain("<context>");
+    expect(error).toHaveBeenCalledWith("Episodic memory retry failed:", expect.any(Error));
+    error.mockRestore();
+  });
+});
+
+describe("agent_settled handler", () => {
+  test("should checkpoint immediately and persist extracted memory in the background queue", async () => {
+    const pi = createMockPi();
+    accountant24Extension(pi as any);
+    const complete = vi.fn().mockResolvedValue({
+      content: [
+        {
+          type: "text",
+          text: '[{"name":"zara-coat","type":"transaction-context","description":"ZARA coat bought in Hangzhou","body":"On 2026-10-10 the user bought a coat at ZARA in Hangzhou for CNY 100 using Assets:Cash."}]',
+        },
+      ],
+      stopReason: "stop",
+    });
+    const branch = [
+      {
+        type: "message",
+        id: "u1",
+        parentId: null,
+        timestamp: "2026-10-10T00:00:00Z",
+        message: { role: "user", content: "I bought a coat in Hangzhou", timestamp: 1 },
+      },
+    ];
+
+    await pi.handlers.agent_settled(
+      { type: "agent_settled" },
+      {
+        model: { id: "test-model" },
+        modelRegistry: { complete },
+        sessionManager: { getBranch: () => branch },
+      },
+    );
+
+    expect(pi.appendEntry).toHaveBeenCalledWith(
+      "accountant24-episodic-memory-checkpoint",
+      expect.objectContaining({ throughEntryId: "u1", jobId: expect.any(String) }),
+    );
+    await episodicMemoryCoordinator.idle();
+    expect(await findMemoryByName("zara-coat")).toEqual(
+      expect.objectContaining({ body: expect.stringContaining("Hangzhou") }),
+    );
+  });
+
+  test("should do nothing when no model is selected", async () => {
+    const pi = createMockPi();
+    accountant24Extension(pi as any);
+    await pi.handlers.agent_settled(
+      { type: "agent_settled" },
+      { model: undefined, modelRegistry: {}, sessionManager: { getBranch: () => [] } },
+    );
+    expect(pi.appendEntry).not.toHaveBeenCalled();
+  });
+
+  test("should contain extraction failures after checkpointing the turn", async () => {
+    const pi = createMockPi();
+    accountant24Extension(pi as any);
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const branch = [
+      {
+        type: "message",
+        id: "u1",
+        parentId: null,
+        timestamp: "2026-10-10T00:00:00Z",
+        message: { role: "user", content: "I visited Hangzhou", timestamp: 1 },
+      },
+    ];
+
+    await pi.handlers.agent_settled(
+      { type: "agent_settled" },
+      {
+        model: { id: "test-model" },
+        modelRegistry: { complete: vi.fn().mockRejectedValue(new Error("provider unavailable")) },
+        sessionManager: { getBranch: () => branch },
+      },
+    );
+    await episodicMemoryCoordinator.idle();
+    await Promise.resolve();
+
+    expect(pi.appendEntry).toHaveBeenCalledTimes(1);
+    expect(error).toHaveBeenCalledWith("Episodic memory extraction failed:", expect.any(Error));
+    error.mockRestore();
   });
 });

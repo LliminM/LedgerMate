@@ -2,9 +2,11 @@
 // host.ts / runtime.ts (this file is excluded from coverage as entry glue).
 
 import { mkdirSync } from "node:fs";
+import { join } from "node:path";
 import type { AgentHostConfig, AgentHostRequest } from "../../../shared/agentHost";
 import { AgentHost } from "./host";
 import { createRuntimeFactory } from "./runtime";
+import { AgentTraceCollector, JsonlTraceSink } from "./tracing";
 
 const cfg = JSON.parse(process.argv[2] ?? "{}") as AgentHostConfig;
 // The workspace is every session's cwd and must exist before the first runtime
@@ -12,9 +14,12 @@ const cfg = JSON.parse(process.argv[2] ?? "{}") as AgentHostConfig;
 // workspace deleted while the app runs.
 mkdirSync(cfg.workspaceDir, { recursive: true });
 
+const tracer = new AgentTraceCollector({ sink: new JsonlTraceSink(join(cfg.workspaceDir, "traces")) });
+
 const host = new AgentHost({
   createRuntime: createRuntimeFactory(cfg),
   post: (notice) => process.parentPort.postMessage(notice),
+  tracer,
 });
 
 process.parentPort.on("message", (message) => {

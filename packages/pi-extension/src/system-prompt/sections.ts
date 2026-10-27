@@ -11,6 +11,7 @@ export interface ToolInfo {
 export interface ContextSectionInput {
   today: string;
   memory: string;
+  episodicMemories?: Array<{ filename: string; content: string }>;
   accounts: string[];
   payees: string[];
   tags: string[];
@@ -50,6 +51,13 @@ export function buildContextSection(input: ContextSectionInput): string {
     // anchors for edits straight from it. Guidance on how to treat it lives
     // in system.md.
     parts.push(`\n\n<memory>\n${input.memory}\n</memory>`);
+  }
+
+  if (input.episodicMemories && input.episodicMemories.length > 0) {
+    const files = input.episodicMemories
+      .map((memory) => `<episodic_memory filename="${memory.filename}">\n${memory.content}\n</episodic_memory>`)
+      .join("\n\n");
+    parts.push(`\n\n<episodic_memories>\n${files}\n</episodic_memories>`);
   }
 
   parts.push(

@@ -82,12 +82,37 @@ describe("guardMemoryToolCall()", () => {
       const result = await guardMemoryToolCall(editEvent("memory.md"), BASE);
       expect(result).toBeUndefined();
     });
+
+    test("should block direct edits to episodic memory files", async () => {
+      const result = await guardMemoryToolCall(editEvent("memories/trip.md"), BASE);
+      expect(result).toEqual({
+        block: true,
+        reason: expect.stringContaining("managed by the background memory process"),
+      });
+    });
+  });
+
+  describe("episodic memory writes", () => {
+    test("should block relative writes below memories", async () => {
+      const result = await guardMemoryToolCall(writeEvent("memories/trip.md"), BASE);
+      expect(result).toEqual({ block: true, reason: expect.stringContaining("delete_episodic_memory") });
+    });
+
+    test("should block absolute writes below memories", async () => {
+      const result = await guardMemoryToolCall(writeEvent(join(BASE, "memories", "trip.md")), BASE);
+      expect(result).toEqual({ block: true, reason: expect.any(String) });
+    });
+
+    test("should allow a similarly named directory outside the workspace memory directory", async () => {
+      const result = await guardMemoryToolCall(writeEvent(join(BASE, "other-memories", "trip.md")), BASE);
+      expect(result).toBeUndefined();
+    });
   });
 
   describe("bash", () => {
     test("should block a bash command that mentions memory.md", async () => {
       const result = await guardMemoryToolCall(bashEvent("cat memory.md"), BASE);
-      expect(result).toEqual({ block: true, reason: expect.stringContaining("Do not access memory.md with bash") });
+      expect(result).toEqual({ block: true, reason: expect.stringContaining("Do not access memory files with bash") });
       expect(result?.reason).toContain("edit tool");
     });
 
@@ -98,6 +123,24 @@ describe("guardMemoryToolCall()", () => {
 
     test("should allow bash commands that do not mention memory.md", async () => {
       const result = await guardMemoryToolCall(bashEvent("hledger balance -f ledger/main.journal"), BASE);
+      expect(result).toBeUndefined();
+    });
+
+    test("should block bash access to the episodic memory directory", async () => {
+      const result = await guardMemoryToolCall(bashEvent("ls memories"), BASE);
+      expect(result).toEqual({
+        block: true,
+        reason: expect.stringContaining("episodic memory is managed automatically"),
+      });
+    });
+
+    test("should block episodic memory paths followed by shell operators", async () => {
+      const result = await guardMemoryToolCall(bashEvent("cd memories&&ls"), BASE);
+      expect(result).toEqual({ block: true, reason: expect.any(String) });
+    });
+
+    test("should not mistake a hyphenated directory name for the episodic memory directory", async () => {
+      const result = await guardMemoryToolCall(bashEvent("ls old-memories"), BASE);
       expect(result).toBeUndefined();
     });
 

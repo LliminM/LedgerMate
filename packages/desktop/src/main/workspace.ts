@@ -14,11 +14,13 @@ import gitignore from "./template/.gitignore?raw";
 import accountsJournal from "./template/ledger/accounts.journal?raw";
 import commoditiesJournal from "./template/ledger/commodities.journal?raw";
 import mainJournal from "./template/ledger/main.journal?raw";
+import episodicMemoryIndex from "./template/memories/MEMORY.md?raw";
 import memoryMd from "./template/memory.md?raw";
 
 /** Workspace scaffold manifest. Relative paths → file contents. */
 const TEMPLATE_FILES: Record<string, string> = {
   "memory.md": memoryMd,
+  "memories/MEMORY.md": episodicMemoryIndex,
   ".gitignore": gitignore,
   "ledger/accounts.journal": accountsJournal,
   "ledger/commodities.journal": commoditiesJournal,
@@ -35,7 +37,7 @@ function writeIfNotExists(filePath: string, content: string): void {
 export async function ensureWorkspace(): Promise<void> {
   const home = workspaceDir();
 
-  for (const dir of ["ledger", "files", "sessions", "rag/chroma"]) {
+  for (const dir of ["ledger", "files", "sessions", "rag/chroma", "memories"]) {
     mkdirSync(join(home, dir), { recursive: true });
   }
 

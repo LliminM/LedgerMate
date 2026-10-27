@@ -349,6 +349,17 @@ describe("createGuidelineRagService()", () => {
     ).toBeInstanceOf(GuidelineRagService);
   });
 
+  it("should load the policy directory from the supplied environment", async () => {
+    const service = createGuidelineRagService({
+      [CHROMA_URL_ENV]: "http://127.0.0.1:43123",
+      ACCOUNTANT24_POLICY_DIR: "/definitely-missing-accountant24-policy",
+      DASHSCOPE_API_KEY: "key",
+      DASHSCOPE_BASE_URL: "https://dashscope.example/v1",
+    });
+
+    await expect(service.ensureIndexed()).rejects.toThrow("Unable to read the bundled reimbursement guideline");
+  });
+
   it("should lazily create and then reuse the process-wide service", () => {
     const previous = {
       chroma: process.env[CHROMA_URL_ENV],

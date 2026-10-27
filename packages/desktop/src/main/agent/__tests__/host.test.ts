@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 import type { AgentHostNotice } from "../../../shared/agentHost";
 import { AgentHost, type HostRuntime, type HostSession, type UiBridge } from "../host/host";
+import type { AgentTraceObserver } from "../host/tracing";
 
 // AgentHost is the utilityProcess core: per-session runtimes, RPC-shaped
 // command dispatch, event serialization, and the idle reaper/LRU cap. The pi
@@ -60,10 +61,15 @@ let fakes: Map<string, FakeSession>;
 let disposes: Map<string, ReturnType<typeof vi.fn>>;
 let uis: Map<string, UiBridge>;
 let factory: Mock<(sessionPath: string, ui: UiBridge) => Promise<HostRuntime>>;
+let tracer: {
+  observe: Mock<AgentTraceObserver["observe"]>;
+  closeSession: Mock<AgentTraceObserver["closeSession"]>;
+  flush: Mock<AgentTraceObserver["flush"]>;
+};
 let host: AgentHost;
 
 /** Build a host whose factory hands out one scripted fake session per path. */
-function makeHost(opts?: { failFor?: Set<string> }) {
+function makeHost(opts?: { failFor?: Set<string>; tracer?: AgentTraceObserver | null }) {
   posts = [];
   fakes = new Map();
   disposes = new Map();
@@ -77,7 +83,16 @@ function makeHost(opts?: { failFor?: Set<string> }) {
     disposes.set(sessionPath, dispose);
     return { session: fake.session, dispose };
   });
-  host = new AgentHost({ createRuntime: factory, post: (n) => posts.push(n) });
+  tracer = {
+    observe: vi.fn<AgentTraceObserver["observe"]>(),
+    closeSession: vi.fn<AgentTraceObserver["closeSession"]>(),
+    flush: vi.fn<AgentTraceObserver["flush"]>(async () => {}),
+  };
+  host = new AgentHost({
+    createRuntime: factory,
+    post: (n) => posts.push(n),
+    ...(opts?.tracer === null ? {} : { tracer: opts?.tracer ?? tracer }),
+  });
   return host;
 }
 
@@ -390,12 +405,38 @@ describe("event forwarding", () => {
     command(B, { type: "get_state", id: "2" });
     await flush();
     posts.length = 0;
+    tracer.observe.mockClear();
 
     fakes.get(A)?.emit({ type: "agent_start" });
     fakes.get(B)?.emit({ type: "message_update", message: { role: "assistant" } });
 
     expect(lines(A)).toEqual([{ type: "agent_start" }]);
     expect(lines(B)).toEqual([{ type: "message_update", message: { role: "assistant" } }]);
+    expect(tracer.observe).toHaveBeenNthCalledWith(
+      1,
+      {
+        sessionPath: A,
+        sessionId: "sid-1",
+        model: { provider: "anthropic", id: "claude" },
+        thinkingLevel: "medium",
+      },
+      { type: "agent_start" },
+    );
+  });
+
+  it("should still forward an event when the trace observer throws", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    tracer.observe.mockImplementationOnce(() => {
+      throw new Error("trace failed");
+    });
+    command(A, { type: "get_state", id: "1" });
+    await flush();
+    posts.length = 0;
+
+    fakes.get(A)?.emit({ type: "agent_start" });
+
+    expect(lines(A)).toEqual([{ type: "agent_start" }]);
+    expect(console.error).toHaveBeenCalledWith("[agent-trace] observer failed: trace failed");
   });
 });
 
@@ -444,6 +485,7 @@ describe("dispose_session", () => {
 
     expect(fakes.get(A)?.session.abort).toHaveBeenCalled();
     expect(disposes.get(A)).toHaveBeenCalled();
+    expect(tracer.closeSession).toHaveBeenCalledWith(A, "cancelled");
     expect(posts).toContainEqual({ kind: "session_closed", sessionPath: A, reason: "disposed", requestId: "r1" });
   });
 
@@ -485,6 +527,21 @@ describe("dispose_session", () => {
     await flush();
     expect(posts).toContainEqual({ kind: "session_closed", sessionPath: A, reason: "disposed", requestId: "r1" });
   });
+
+  it("should still ack when the trace observer fails to close the run", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    command(A, { type: "get_state", id: "1" });
+    await flush();
+    tracer.closeSession.mockImplementationOnce(() => {
+      throw new Error("trace close failed");
+    });
+
+    host.handleMessage({ kind: "dispose_session", sessionPath: A, requestId: "r1" });
+    await flush();
+
+    expect(posts).toContainEqual({ kind: "session_closed", sessionPath: A, reason: "disposed", requestId: "r1" });
+    expect(console.error).toHaveBeenCalledWith("[agent-trace] close failed: trace close failed");
+  });
 });
 
 describe("disposeAll", () => {
@@ -496,6 +553,15 @@ describe("disposeAll", () => {
     await host.disposeAll();
     expect(disposes.get(A)).toHaveBeenCalled();
     expect(disposes.get(B)).toHaveBeenCalled();
+    expect(tracer.flush).toHaveBeenCalledOnce();
+  });
+
+  it("should finish shutdown when the trace sink fails to flush", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    tracer.flush.mockRejectedValueOnce(new Error("disk unavailable"));
+
+    await expect(host.disposeAll()).resolves.toBeUndefined();
+    expect(console.error).toHaveBeenCalledWith("[agent-trace] flush failed: disk unavailable");
   });
 });
 
@@ -508,6 +574,7 @@ describe("idle reaper", () => {
 
     await vi.advanceTimersByTimeAsync(16 * 60_000);
     expect(disposes.get(A)).toHaveBeenCalled();
+    expect(tracer.closeSession).toHaveBeenCalledWith(A, "incomplete");
     expect(posts).toContainEqual({ kind: "session_closed", sessionPath: A, reason: "reaped" });
   });
 

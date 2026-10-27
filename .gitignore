@@ -13,3 +13,5 @@ coverage/
 # Playwright E2E artifacts
 test-results/
 playwright-report/
+# Generated retrieval-evaluation reports (contain no source-of-truth data).
+rag-eval-results/

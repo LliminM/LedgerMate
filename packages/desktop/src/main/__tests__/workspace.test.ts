@@ -28,6 +28,7 @@ let BASE = "";
 /** Expected template files — mirrors the manifest in workspace.ts. */
 const EXPECTED_TEMPLATE_FILES = [
   "memory.md",
+  "memories/MEMORY.md",
   ".gitignore",
   "ledger/accounts.journal",
   "ledger/commodities.journal",
@@ -61,6 +62,12 @@ describe("ensureWorkspace()", () => {
   test("should create files directory", async () => {
     await ensureWorkspace();
     expect(existsSync(join(BASE, "files"))).toBe(true);
+  });
+
+  test("should create episodic memory directory and catalog", async () => {
+    await ensureWorkspace();
+    expect(existsSync(join(BASE, "memories"))).toBe(true);
+    expect(readFileSync(join(BASE, "memories", "MEMORY.md"), "utf-8")).toBe("# Episodic memories\n");
   });
 
   test("should create the local Chroma data directory", async () => {
@@ -138,6 +145,9 @@ describe("ensureWorkspace()", () => {
     const content = readFileSync(join(BASE, ".gitignore"), "utf-8");
     expect(content).toContain("auth.json");
     expect(content).toContain("rag/chroma/");
+    expect(content).toContain("traces/");
+    expect(content).toContain("memories/.pending-writes.json");
+    expect(content).toContain("memories/.*.tmp");
   });
 
   test("should produce an output file for every template file", async () => {

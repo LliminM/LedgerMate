@@ -1,7 +1,7 @@
 import { ChromaClient, type Collection, type CollectionMetadata, type Metadata } from "chromadb";
 import { buildGuidelineChunks, GUIDELINE_CHUNKING_VERSION } from "./chunk";
 import { createAlibabaEmbeddingProvider, type TextEmbedder } from "./embedding";
-import { extractGuidelinePages, loadGuidelineDescriptor } from "./source";
+import { extractGuidelinePages, loadGuidelineDescriptor, resolveGuidelinePaths } from "./source";
 import type { GuidelineChunk, GuidelineDescriptor, GuidelineMatch, GuidelineSearchResult } from "./types";
 
 export const GUIDELINE_COLLECTION_NAME = "accountant24-reimbursement-guideline";
@@ -155,7 +155,7 @@ export function createGuidelineRagService(env: NodeJS.ProcessEnv = process.env):
   return new GuidelineRagService({
     client,
     embedder: createAlibabaEmbeddingProvider(env),
-    loadDescriptor: loadGuidelineDescriptor,
+    loadDescriptor: () => loadGuidelineDescriptor(resolveGuidelinePaths(env)),
     extractPages: extractGuidelinePages,
     buildChunks: buildGuidelineChunks,
   });

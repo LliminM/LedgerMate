@@ -1,3 +1,6 @@
 auth.json
 sessions/
 rag/chroma/
+traces/
+memories/.pending-writes.json
+memories/.*.tmp

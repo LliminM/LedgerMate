@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
@@ -28,6 +28,8 @@ test("uses the --workspace folder instead of ACCOUNTANT24_WORKSPACE and shows it
 
   // Seeded at the flagged path, not in the env-var decoy.
   expect(existsSync(path.join(flagHome, "ledger", "main.journal"))).toBe(true);
+  expect(existsSync(path.join(flagHome, "memories", "MEMORY.md"))).toBe(true);
+  expect(readFileSync(path.join(flagHome, "memories", "MEMORY.md"), "utf8")).toBe("# Episodic memories\n");
   expect(existsSync(path.join(flagHome, ".git"))).toBe(true);
   expect(existsSync(path.join(launched.home, "ledger"))).toBe(false);
 

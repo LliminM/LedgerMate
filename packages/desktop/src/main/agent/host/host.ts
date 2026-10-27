@@ -8,6 +8,7 @@
 // drive it with fakes (the real factory lives in ./runtime.ts).
 
 import type { AgentHostNotice, AgentHostRequest } from "../../../shared/agentHost";
+import type { AgentTraceObserver, TraceSessionContext } from "./tracing";
 
 /** The slice of pi's AgentSession the host dispatches on. */
 export interface HostSession {
@@ -82,6 +83,9 @@ interface SessionEntry {
 interface AgentHostDeps {
   createRuntime: RuntimeFactory;
   post: (notice: AgentHostNotice) => void;
+  /** Optional local trace observer. It is isolated from the agent protocol: a
+   *  tracing failure must never interrupt a run or suppress a UI event. */
+  tracer?: AgentTraceObserver;
   /** Injectable clock for reaper tests. */
   now?: () => number;
 }
@@ -126,6 +130,11 @@ export class AgentHost {
   /** Dispose every session (host shutdown). */
   async disposeAll(): Promise<void> {
     await Promise.all([...this.sessions.keys()].map((path) => this.disposeSession(path, "disposed")));
+    try {
+      await this.deps.tracer?.flush();
+    } catch (error) {
+      console.error(`[agent-trace] flush failed: ${errorMessage(error)}`);
+    }
   }
 
   // ---- session lifecycle -----------------------------------------------------
@@ -218,12 +227,37 @@ export class AgentHost {
     } catch {
       // creation failed or teardown failed — the slot is gone either way
     }
+    try {
+      this.deps.tracer?.closeSession(sessionPath, reason === "disposed" ? "cancelled" : "incomplete");
+    } catch (error) {
+      console.error(`[agent-trace] close failed: ${errorMessage(error)}`);
+    }
     this.deps.post(close);
   }
 
   // ---- command dispatch (port of rpc-mode's handleCommand) -------------------
 
   private postEvent(sessionPath: string, event: Record<string, unknown>): void {
+    const session = this.sessions.get(sessionPath)?.session;
+    const model = session?.model as { provider?: unknown; id?: unknown } | undefined;
+    const context: TraceSessionContext = {
+      sessionPath,
+      ...(typeof session?.sessionId === "string" ? { sessionId: session.sessionId } : {}),
+      ...(model && (typeof model.provider === "string" || typeof model.id === "string")
+        ? {
+            model: {
+              ...(typeof model.provider === "string" ? { provider: model.provider } : {}),
+              ...(typeof model.id === "string" ? { id: model.id } : {}),
+            },
+          }
+        : {}),
+      ...(typeof session?.thinkingLevel === "string" ? { thinkingLevel: session.thinkingLevel } : {}),
+    };
+    try {
+      this.deps.tracer?.observe(context, event);
+    } catch (error) {
+      console.error(`[agent-trace] observer failed: ${errorMessage(error)}`);
+    }
     this.deps.post({ kind: "event", sessionPath, line: JSON.stringify(event) });
   }
 

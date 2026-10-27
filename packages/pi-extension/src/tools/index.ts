@@ -3,6 +3,7 @@ export { addPricesTool } from "./add-prices";
 export { addTransactionsTool } from "./add-transactions";
 export { bulkEditTransactionsTool } from "./bulk-edit-transactions";
 export { commitAndPushTool } from "./commit-and-push";
+export { deleteEpisodicMemoryTool } from "./delete-episodic-memory";
 export { extractTextTool } from "./extract-text";
 export { queryTool } from "./query";
 export { searchReimbursementGuidelineTool } from "./search-reimbursement-guideline";
